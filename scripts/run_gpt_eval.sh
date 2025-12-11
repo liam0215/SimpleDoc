@@ -4,15 +4,15 @@ set -e  # Exit on error
 
 # Loop over datasets
 for DS_NAME in MMLongBench; do
-    OUTPUT_DIR="outputs/simpledoc_eval/${DS_NAME}"
+    OUTPUT_DIR="outputs/simpledoc_eval_ds_ocr/${DS_NAME}"
     GROUND_TRUTH="data/${DS_NAME}/samples.json"
-    EVAL_MODEL="gpt-4.1"
+    EVAL_MODEL="gpt-5.1"
     API_KEY_FILE="./openaikey"
 
     echo "Processing dataset: ${DS_NAME}"
     mkdir -p "$OUTPUT_DIR"
 
-    RESULT_FILES=outputs/simpledoc_chat/"${DS_NAME}"/results.json
+    RESULT_FILES=outputs/simpledoc_chat_ds_ocr/results.json
 
     for RESULT_FILE in $RESULT_FILES; do
         FILENAME=$(basename "$RESULT_FILE" .json)
@@ -40,7 +40,7 @@ echo ""
 echo "Summary of evaluation results:"
 for DS_NAME in MMLongBench; do
     echo "Dataset: $DS_NAME"
-    for EVAL_FILE in outputs/simpledoc_eval/"${DS_NAME}"/eval_*.jsonl; do
+    for EVAL_FILE in outputs/simpledoc_eval_ds_ocr/"${DS_NAME}"/eval_*.jsonl; do
         FILENAME=$(basename "$EVAL_FILE" .jsonl)
         echo -n "  ${FILENAME}: "
         python -c "

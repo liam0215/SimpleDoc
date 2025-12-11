@@ -2,7 +2,7 @@ import os
 import sys  # Added for sys module
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import base64
-import fitz  # PyMuPDF, imported as fitz
+import pymupdf
 import pandas as pd
 from tqdm import tqdm
 import ast  # For safely evaluating string representations of lists if needed
@@ -282,7 +282,7 @@ def summarize_document_pages(dataset_df: pd.DataFrame, args, client):
                 continue
                 
             # Open the PDF to get the total page count
-            doc = fitz.open(pdf_file_path)
+            doc = pymupdf.open(pdf_file_path)
             total_pages = doc.page_count
             doc.close()
             

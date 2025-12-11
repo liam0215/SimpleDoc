@@ -1,6 +1,6 @@
 import os
 import base64
-import fitz  # PyMuPDF, imported as fitz
+import pymupdf
 import pandas as pd
 from tqdm import tqdm
 import ast  # For safely evaluating string representations of lists if needed
@@ -110,7 +110,7 @@ def convert_pdf_pages_to_base64_images(pdf_path: str, page_numbers: list[int], i
         return base64_images, page_texts
 
     try:
-        doc = fitz.open(pdf_path)
+        doc = pymupdf.open(pdf_path)
     except Exception as e:
         print(f"Error opening PDF '{pdf_path}': {e}")
         return base64_images, page_texts

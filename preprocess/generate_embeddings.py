@@ -3,7 +3,7 @@ import os
 import argparse
 import torch
 from torch.utils.data import Dataset, DataLoader
-import fitz  # PyMuPDF
+import pymupdf
 from PIL import Image
 import io
 from tqdm import tqdm
@@ -29,7 +29,7 @@ class PDFPageDataset(Dataset):
         for pdf_path in tqdm(pdf_paths, desc="Indexing PDFs"):
             self.page_index[os.path.basename(pdf_path)] = []
             self.id_2_doc.append(os.path.basename(pdf_path))
-            doc = fitz.open(pdf_path)
+            doc = pymupdf.open(pdf_path)
             for page_num in range(doc.page_count):
                 self.page_index[os.path.basename(pdf_path)].append({
                     "pdf_path": pdf_path,
@@ -47,7 +47,7 @@ class PDFPageDataset(Dataset):
         page_info_list = self.page_index[self.id_2_doc[idx]]
         pdf_path = page_info_list[0]["pdf_path"]
         doc_id = page_info_list[0]["doc_id"]
-        doc = fitz.open(pdf_path)
+        doc = pymupdf.open(pdf_path)
         page_imgs = []
         for page_info in page_info_list:
             # Convert page to image using convert_pdf_pages_to_base64_images logic

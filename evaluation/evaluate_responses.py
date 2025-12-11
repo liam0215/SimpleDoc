@@ -91,7 +91,7 @@ Return only a string with these scores in a dictionary and can be parsed by json
         response = client.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=max_tokens,
+            max_completion_tokens=max_tokens,
             temperature=temperature
         )
         
@@ -135,7 +135,7 @@ def process_item(item, client, model, ground_truth_map, max_tokens, temperature,
     """Process a single evaluation item."""
     
     try:
-        key = f"{item['doc_id']}_{item['question']}"
+        key = f"{item['input']['doc_id']}_{item['input']['question']}"
         ground_truth = ground_truth_map.get(key, '')
         
         # Skip items with "Not answerable" ground truth
@@ -145,8 +145,8 @@ def process_item(item, client, model, ground_truth_map, max_tokens, temperature,
         qa_error = item.get('error', None)
         if qa_error is not None and type(qa_error) == str:
             return {
-                "doc_id": item['doc_id'],
-                "question": item['question'],
+                "doc_id": item['input']['doc_id'],
+                "question": item['input']['question'],
                 "error": item['error'],
                 "score": 0,
                 "explanation": "Error during evaluation"
@@ -154,8 +154,8 @@ def process_item(item, client, model, ground_truth_map, max_tokens, temperature,
 
         if not ground_truth:
             return {
-                "doc_id": item['doc_id'],
-                "question": item['question'],
+                "doc_id": item['input']['doc_id'],
+                "question": item['input']['question'],
                 "error": "No ground truth found",
                 "score": 0,
                 "explanation": "No ground truth answer available for evaluation"
@@ -163,8 +163,8 @@ def process_item(item, client, model, ground_truth_map, max_tokens, temperature,
         
         # Get the processed response or extract from original if not available
         processed_response = item.get('final_answer')
-        if not processed_response and 'ori_response' in item:
-            processed_response = extract_answer_from_original(item['ori_response'])
+        if not processed_response and 'answer' in item['input']:
+            processed_response = extract_answer_from_original(item['input']['answer'])
         
         # Evaluate the response
         eval_result = evaluate_response(
@@ -172,25 +172,25 @@ def process_item(item, client, model, ground_truth_map, max_tokens, temperature,
             model, 
             processed_response or '', 
             ground_truth, 
-            item['question'],
+            item['input']['question'],
             max_tokens,
             temperature
         )
         
         return {
             "score": eval_result['score'],
-            "doc_id": item['doc_id'],
-            "question": item['question'],
+            "doc_id": item['input']['doc_id'],
+            "question": item['input']['question'],
             "predicted_answer": processed_response or '',
             "ground_truth": ground_truth,
             "explanation": eval_result['explanation'],
             "error": None
         }
     except Exception as e:
-        logger.error(f"Error evaluating response for {item.get('doc_id')}: {str(e)}")
+        logger.error(f"Error evaluating response for {item['input'].get('doc_id')}: {str(e)}")
         return {
-            "doc_id": item.get('doc_id'),
-            "question": item.get('question'),
+            "doc_id": item['input'].get('doc_id'),
+            "question": item['input'].get('question'),
             "error": f"Evaluation error: {str(e)}",
             "score": 0,
             "explanation": f"Exception during evaluation: {str(e)}"
